@@ -1,6 +1,7 @@
 import random
 from datetime import datetime
-from settings import *
+import json
+
 
 # Input tables
 exit_table = ("exit", "e", "close")
@@ -28,6 +29,7 @@ class_dict = {
     4: "Scout",
     5: "Random"
 }
+grenades_str, weapons_str, pclass_str, savetofile_str = "Grenades", "Weapons", "pClass", "SaveToFile"  # seems a lil dumb, needed for Settings console prompt.
 
 
 # Generatable options and generator
@@ -65,11 +67,7 @@ gunner_secondaries = {
     2: ("BRT7 Burst Fire Gun", ("Composite Casings", "Full Chamber Seal", "Compact Mags", "Experimental Rounds", "Electro Minelets", "Micro Flechettes", "Lead Spray")),
     3: ("ArmsKore Coil Gun", ("Re-atomizer", "Ultra-Magnetic Coils", "Backfeeding Module", "The Mole", "Hellfire", "Triple-Tech Chambers")),
 }
-gunner_grenades = {
-    1: "Sticky Grenade",
-    2: "Incendiary Grenade",
-    3: "Cluster Grenade",
-}
+gunner_grenades = ("Sticky Grenade", "Incendiary Grenade", "Cluster Grenade")
 
 scout_primaries = {
     1: ("Deepcore GK2", ("Compact Ammo", "Gas Rerouting", "Homebrew Powder", "Overclocked Firing Mechanism", "Bullets of Mercy", "AI Stability Engine", "Electrifying Reload")),
@@ -81,11 +79,7 @@ scout_secondaries = {
     2: ("Zhukov NUK17", ("Minimal Magazines", "Custom Casings", "Cryo Minelets", "Embedded Detonators", "Gas Recycling")),
     3: ("Nishanka Boltshark X-80", ("Quick Fire", "The Specialist", "Cryo Bolt", "Fire Bolt", "Bodkin Points", "Trifork Volley")),
 }
-scout_grenades = {
-    1: "Inhibitor-Field Generator",
-    2: "Cryo Grenade",
-    3: "Pheromone Canister",
-}
+scout_grenades = ("Inhibitor-Field Generator", "Cryo Grenade", "Pheromone Canister")
 
 character_equipment = {
     1: (driller_primaries, driller_secondaries, driller_grenades),
@@ -97,23 +91,23 @@ character_equipment = {
 
 
 def generate_random_equipment():
-    if pClass != 5:  # Set class
-        classnum = pClass
+    if settings()["pClass"] != 5:  # Set class
+        classnum = settings()["pClass"]
     else:
         classnum = random.randint(1, 4)
 
     output = f"Class: {class_dict[classnum]}\n"
-    if Grenades:
+    if settings()["Grenades"]:
         output = f"{output}Grenade: {random.choice(character_equipment[classnum][2])}\n"
-    if Weapons == 1 or Weapons == 3:
+    if settings()["Weapons"] == 1 or settings()["Weapons"] == 3:
         primary = character_equipment[classnum][0][random.randint(1, 3)]
         output = f"{output}Primary: {primary[0]} - {random.choice(primary[1])}\n"
-    if Weapons == 2 or Weapons == 3:
+    if settings()["Weapons"] == 2 or settings()["Weapons"] == 3:
         secondary = character_equipment[classnum][1][random.randint(1, 3)]
         output = f"{output}Secondary: {secondary[0]} - {random.choice(secondary[1])}\n"
 
     print(f"\n{output}")
-    if SaveToFile:
+    if settings()["SaveToFile"]:
         dp, empt = ":", "."
         with open(f"{str(datetime.now()).replace(dp, empt)}.txt", "w") as writefile:
             writefile.write(output)
@@ -126,8 +120,20 @@ def clean_string_make(lenght: int = 40) -> str:
     return output
 
 
+def settings() -> dict:
+    with open("settings.json", "r") as settingsjson:
+        return json.load(settingsjson)
+
+
+def write_setting(setting: str, value: bool or int):
+    settingsdict = settings()
+    settingsdict[setting] = value
+    with open("settings.json", "w") as settingsjson:
+        json.dump(settingsdict, settingsjson)
+
+
 # Main code
-print(clean_string_make())
+# print(clean_string_make())  # Old, redundant line that doesn't really serve any purpose
 while True:
     print("Generate, Settings, Clean, Exit")
     inputy = input("//: ").lower().removesuffix("\n")
@@ -140,45 +146,37 @@ while True:
 
     elif inputy in settings_table:
         while True:
-            print(f"\nSettings: Grenades, Weapons, Classes, Save to file, Back/Exit\nCurrent settings:\nGrenades - {Grenades}\nWeapons - {weapons_dict[Weapons]}\nClass - {class_dict[pClass]}\nSave to file - {SaveToFile}\n")
+            print(f"\nSettings: Grenades, Weapons, Classes, Save to file, Back/Exit\nCurrent settings:\nGrenades - {settings()[grenades_str]}\nWeapons - {weapons_dict[settings()[weapons_str]]}\nClass - {class_dict[settings()[pclass_str]]}\nSave to file - {settings()[savetofile_str]}\n")
             inputy2 = input("//Settings: ").lower().removesuffix("\n")
             if inputy2 in return_table + exit_table:
                 break
 
             elif inputy2 in grenades_table:
-                if Grenades is False:
-                    Grenades = True
+                if settings()["Grenades"] is False:
+                    write_setting("Grenades", True)
                 else:
-                    Grenades = False
-                with open("settings.py", "w") as settings:
-                    settings.write(f"Grenades = {Grenades}\nWeapons = {Weapons}\npClass = {pClass}\nSaveToFile = {SaveToFile}\n")
+                    write_setting("Grenades", False)
                 print("Changed grenade settings")
 
             elif inputy2 in weapons_table:
-                if Weapons == 3:
-                    Weapons = 1
+                if settings()["Weapons"] == 3:
+                    write_setting("Weapons", 1)
                 else:
-                    Weapons += 1
-                with open("settings.py", "w") as settings:
-                    settings.write(f"Grenades = {Grenades}\nWeapons = {Weapons}\npClass = {pClass}\nSaveToFile = {SaveToFile}\n")
+                    write_setting("Weapons", settings()["Weapons"]+1)
                 print("Changed weapons settings")
 
             elif inputy2 in classes_table:
-                if pClass == 5:
-                    pClass = 1
+                if settings()["pClass"] == 5:
+                    write_setting("pClass", 1)
                 else:
-                    pClass += 1
-                with open("settings.py", "w") as settings:
-                    settings.write(f"Grenades = {Grenades}\nWeapons = {Weapons}\npClass = {pClass}\nSaveToFile = {SaveToFile}\n")
+                    write_setting("pClass", settings()["pClass"]+1)
                 print("Changed class settings")
 
             elif inputy2 in save_to_file_table:
-                if SaveToFile is False:
-                    SaveToFile = True
+                if settings()["SaveToFile"] is False:
+                    write_setting("SaveToFile", True)
                 else:
-                    SaveToFile = False
-                with open("settings.py", "w") as settings:
-                    settings.write(f"Grenades = {Grenades}\nWeapons = {Weapons}\npClass = {pClass}\nSaveToFile = {SaveToFile}\n")
+                    write_setting("SaveToFile", False)
                 print("Changed saving settings")
             else:
                 print("Unrecognised input.\n")
