@@ -10,13 +10,20 @@ settings_table = ("s", "settings", "o", "options")
 generate_table = ("g", "generate", "start", "s")
 return_table = ("back", "b")
 clean_table = ("clean", "c", "empty")
+information_table = ("i", "info", "information")
 
 grenades_table = ("g", "grenades", "o", "nades")
-weapons_table = ("w", "weapons", "guns")
+weapons_table = ("w", "weapons", "guns", "weapon")
 classes_table = ("c", "class", "classes", "dwarf")
 save_to_file_table = ("s", "save", "file", "save to file")
 no_overclock_table = ("no", "no overclock", "n")
 upgrades_table = ("u", "upgrades")
+all_overclocks_table = ("enable", "on", "true")
+my_overclocks_table = ("my", "my oc", "my ocs", "my overclocks", "m")
+
+
+list_table = ("l", "list")
+edit_table = ("e", "edit")
 
 
 # Settings -- Translate ints to str from settings. These are for displaying on the settings screen
@@ -32,7 +39,7 @@ class_dict = {
     4: "Scout",
     5: "Random"
 }
-grenades_str, weapons_str, pclass_str, savetofile_str, no_overclock_str_set, upgrades_str = "Grenades", "Weapons", "pClass", "SaveToFile", "NoOverclock", "Upgrades"
+grenades_str, weapons_str, pclass_str, savetofile_str, no_overclock_str_set, upgrades_str, all_overclocks_str = "Grenades", "Weapons", "pClass", "SaveToFile", "NoOverclock", "Upgrades", "AllOverclocks"
 # seems a lil dumb, needed for Settings console prompt.
 
 
@@ -49,23 +56,23 @@ def generate_random_equipment():
     # If the classnum != 5, then it's 1-4 and therefore defined. Otherwise, gen a random classnum.
     lsettings = settings()
     if lsettings["pClass"] != 5:  # Set class
-        classnum = str(lsettings["pClass"])
+        classnum = lsettings["pClass"]
     else:
-        classnum = str(random.randint(1, 4))
+        classnum = random.randint(1, 4)
 
-    datadict = loadout_data()  # Because json only takes strings as keys, I needed to do some shuffling.
+    datadict = loadout_data()
 
-    output = f"Class: {class_dict[int(classnum)]}\n"  # Prepare output string
+    output = f"Class: {class_dict[classnum]}\n"  # Prepare output string
+
+    # Checks for setting, if present calls function or picks one.
     if lsettings["Grenades"]:
-        output = f"{output}Grenade: {random.choice(datadict[classnum][2])}\n"  # Picks random grenade from container
+        output = f"{output}Grenade: {random.choice(datadict[str(classnum)][2])}\n"  # Picks random grenade from container
 
     if lsettings["Weapons"] == 1 or lsettings["Weapons"] == 3:
-        primary = datadict[classnum][0][str(random.randint(1, 3))]  # Picks random primary weapon container
-        output = f"{output}Primary: {primary[0]}{gen_upgrades(primary)} - {random.choice(gen_overclock(primary))}\n"  # concs it's name and picks an OC.
+        output = f"{output}{gen_weapon_str(classnum, 0)}"
 
     if lsettings["Weapons"] == 2 or lsettings["Weapons"] == 3:
-        secondary = datadict[classnum][1][str(random.randint(1, 3))]
-        output = f"{output}Secondary: {secondary[0]}{gen_upgrades(secondary)} - {random.choice(gen_overclock(secondary))}\n"  # see primary
+        output = f"{output}{gen_weapon_str(classnum, 1)}"
 
     print(f"\n{output}")  # puts out output
 
@@ -76,12 +83,27 @@ def generate_random_equipment():
             writefile.write(output)
 
 
-def clean_string_make(lenght: int = 60) -> str:
-    # Makes a len long string to print. Not really useful I'll be honest.
-    output = ""
-    for _ in range(lenght):
-        output = f"{output}\n"
-    return output
+def gen_weapon_str(classnum: int, weaponslot: int, ) -> str:
+    # Generates a concable str. Checks for settings itself.
+    randnum = random.randint(1, 3)
+    datadict = loadout_data()
+
+    if weaponslot == 0:
+        slot = "Primary"
+    else:
+        slot = "Secondary"
+
+    if settings()["AllOverclocks"]:
+        weapon = datadict[str(classnum)][weaponslot][str(randnum)]  # Picks random weapon container
+        return f"{slot}: {weapon[0]}{gen_upgrades(weapon)} - {random.choice(gen_overclock(weapon[1]))}\n"  # concs it's name and picks an OC.
+    else:
+        usrdata = user_data()
+        weapon = datadict[str(classnum)][weaponslot][str(randnum)]
+        if not usrdata[str(classnum)][weaponslot][str(randnum)]:  # In the case of no selected overclocks being present, returns 'no overclock'
+            overclock = "No Overclock"
+        else:
+            overclock = gen_overclock(usrdata[str(classnum)][weaponslot][str(randnum)])
+        return f"{slot}: {weapon[0]}{gen_upgrades(weapon)} - {overclock}\n"
 
 
 def settings() -> dict:
@@ -93,6 +115,12 @@ def settings() -> dict:
 def loadout_data() -> dict:
     # Returns the json database that stores all of the loadout information that the program uses.
     with open("data.json", "r") as datajson:
+        return json.load(datajson)
+
+
+def user_data() -> dict:
+    # Returns the json database that has all of the user's saved equipment
+    with open("my_ocs.json", "r") as datajson:
         return json.load(datajson)
 
 
@@ -115,16 +143,218 @@ def gen_upgrades(weapon: list) -> str:
     return output
 
 
-def gen_overclock(weapon: list) -> list:
+def gen_overclock(oclist: list) -> list:
     # Changes Overclocks pool according to settings.
     # Aka: if you enable it to also gen to give no OC, this puts that in there.
     if settings()["NoOverclock"]:
-        return weapon[1] + ["No overclock"]
-    return weapon[1]
+        return oclist + ["No overclock"]
+    return oclist
 
 
-# Main code
-# print(clean_string_make())  # Old, redundant line that doesn't really serve any purpose. Good question as to why it's still used.
+def unpack_to_string(container: tuple or list, space: bool = True, comma: bool = False, moc: bool = False) -> str:
+    # Unpacks container to one long string, makes printing lists etc neater
+    output = ""
+    spaced = ""
+    commad = ""
+    if space:
+        spaced = " "
+    if comma:
+        commad = ","
+    for entry in container:
+        output = f"{output}{entry}{commad}{spaced}"
+    if moc and output == "":
+        return "[None]"
+    return output
+
+
+def my_overclocks_list() -> str:
+    # Load data required for output string
+    usrdata = user_data()
+    weapondata = loadout_data()
+
+    output = "\nYour saved 'obtained Overclocks':\n"
+    # for class and then weapon, make string
+    for classt in range(1, 5):
+        print(classt)
+        output = f"{output}" \
+                 f"{class_dict[classt]}:\n"
+        for weapont in range(1, 6):
+            weaponslot = 0
+            if weapont > 3:  # This is here because when its 4+ it needs to shift to secondary
+                weapont -= 3
+                weaponslot = 1
+
+            output = f"{output}    {weapondata[str(classt)][weaponslot][str(weapont)][0]}: {unpack_to_string(container=usrdata[str(classt)][weaponslot][str(weapont)], space=True, comma=True, moc=True)}\n"
+    return output.removesuffix("\n")
+
+
+def remove_from_list(container: list, content) -> list:
+    # Removes exact content from container.
+    output = []
+    for entry in container:
+        if entry != content:
+            output.append(entry)
+    return output
+
+
+# Interactables
+def settings_loop():
+    while True:
+        print(
+            f"\nSettings: Grenades, Weapons, Classes, No-overclock, Upgrades, All-overclocks, My-Overclocks, Information, Save to file, Back/Exit\n"
+            f"Current settings:\n"
+            f"Grenades - {settings()[grenades_str]}\n"
+            f"Weapons - {weapons_dict[settings()[weapons_str]]}\n"
+            f"Class - {class_dict[settings()[pclass_str]]}\n"
+            f"No-Overclock - {settings()[no_overclock_str_set]}\n"
+            f"Upgrades - {settings()[upgrades_str]}\n"
+            f"Save to file - {settings()[savetofile_str]}\n"
+            f"My-Overclocks - See settings\n"
+            f"  Enabled - {settings()[all_overclocks_str]}\n\n")
+
+        inputy2 = input("//Settings: ").lower().removesuffix("\n")
+        if inputy2 in return_table + exit_table:
+            return
+
+        elif inputy2 in grenades_table:
+            if settings()["Grenades"] is False:
+                write_setting("Grenades", True)
+            else:
+                write_setting("Grenades", False)
+            print("Changed grenade settings")
+
+        elif inputy2 in weapons_table:
+            if settings()["Weapons"] == 3:
+                write_setting("Weapons", 1)
+            else:
+                write_setting("Weapons", settings()["Weapons"] + 1)
+            print("Changed weapons settings")
+
+        elif inputy2 in classes_table:
+            if settings()["pClass"] == 5:
+                write_setting("pClass", 1)
+            else:
+                write_setting("pClass", settings()["pClass"] + 1)
+            print("Changed class settings")
+
+        elif inputy2 in save_to_file_table:
+            if settings()["SaveToFile"] is False:
+                write_setting("SaveToFile", True)
+            else:
+                write_setting("SaveToFile", False)
+            print("Changed saving settings")
+
+        elif inputy2 in no_overclock_table:
+            if settings()["NoOverclock"] is False:
+                write_setting("NoOverclock", True)
+                print("Added 'No Overclock' to the overclocks list")
+            else:
+                write_setting("NoOverclock", False)
+                print("Removed 'No Overclock' from the overclocks list")
+
+        elif inputy2 in upgrades_table:
+            if settings()["Upgrades"] is False:
+                write_setting("Upgrades", True)
+            else:
+                write_setting("Upgrades", False)
+            print("Changed upgrade settings")
+
+        elif inputy2 in my_overclocks_table:
+            my_overclocks_settings()
+
+        elif inputy2 in information_table:
+            print(f"Information:\n"
+                  f"Grenades - determines if grenades are also generated.\n"
+                  f"Weapons - Primary/Secondary/Both - determines what weapons are generated.\n"
+                  f"Class - determines what class is used in generation.\n"
+                  f"No-Overclock - Allows for the generation of 'No Overclock'. Autoenabled on empty lists of My-Overclocks.\n"
+                  f"Upgrades - determines if weapon upgrade strings are generated.\n"
+                  f"Save to file - saves output to file or not. Useful if you want to save it for laters.\n"
+                  f"My-Overclocks:\n"
+                  f"    List - lists all overclocks you have set.\n"
+                  f"    Edit - edits your stored overclocks.\n"
+                  f"    Enable - Use all possible overclocks or only yours")
+
+        else:
+            print("Unrecognised input.\n")
+        print("\n")
+
+
+def my_overclocks_settings():
+    while True:
+        print("\nMy-Overclocks settings: List, Edit, Enable, Back")
+        inpult = input("//My-Overclocks: ")
+
+        if inpult in list_table:
+            print(my_overclocks_list())
+
+        elif inpult in edit_table:
+            my_overclocks_edit()
+
+        elif inpult in all_overclocks_table:
+            if settings()["AllOverclocks"] is False:
+                write_setting("AllOverclocks", True)
+                print("Enabled generation using all overclocks")
+            else:
+                write_setting("AllOverclocks", False)
+                print("Enabled use of 'My Overclocks' only")
+
+        elif inpult in exit_table + return_table:
+            return
+
+        else:
+            print("Unrecognised input\n")
+        print("\n")
+
+
+def my_overclocks_edit():
+    weapondata = loadout_data()
+    pClass, weapon, slot = 1, 1, 0
+    while True:
+        usrdata = user_data()
+        print(f"\nEdit your obtained Overclocks: Class, Weapon, [number] to toggle Overclock")
+        print(f"Current class: {class_dict[pClass]}\nCurrent weapon: {weapondata[str(pClass)][slot][str(weapon)][0]}\n\n[num]: [owned] - [name]       - type [num] to toggle True/False (can be quite picky)")
+        for num, oc in enumerate(weapondata[str(pClass)][slot][str(weapon)][1]):
+            print(f"  {num}: {oc in usrdata[str(pClass)][slot][str(weapon)]} - {oc}")
+        print("\n")
+
+        inpult = input("//My-Overclocks Edit: ")
+        try:
+            if inpult in classes_table:
+                if pClass == 4:
+                    pClass = 1
+                else:
+                    pClass += 1
+                print("Changed class")
+
+            elif inpult in weapons_table:
+                if weapon == 3:
+                    if slot == 1:
+                        slot = 0
+                    elif slot == 0:
+                        slot = 1
+                    weapon = 1
+                else:
+                    weapon += 1
+
+            # Toggle 'owned' status here
+            elif int(inpult.removesuffix("\n").removesuffix(" ")) <= len(weapondata[str(pClass)][slot][str(weapon)][1])-1:
+                if weapondata[str(pClass)][slot][str(weapon)][1][int(inpult.removesuffix("\n").removesuffix(" "))] in usrdata[str(pClass)][slot][str(weapon)]:
+                    usrdata[str(pClass)][slot][str(weapon)] = remove_from_list(usrdata[str(pClass)][slot][str(weapon)], weapondata[str(pClass)][slot][str(weapon)][1][int(inpult.removesuffix("\n").removesuffix(" "))])
+                    with open("my_ocs.json", "w") as userdatajson:
+                        json.dump(usrdata, userdatajson)
+                else:
+                    usrdata[str(pClass)][slot][str(weapon)].append(weapondata[str(pClass)][slot][str(weapon)][1][int(inpult.removesuffix("\n").removesuffix(" "))])
+                    with open("my_ocs.json", "w") as userdatajson:
+                        json.dump(usrdata, userdatajson)
+
+            else:
+                print("Unrecognised input\n")
+        except ValueError:
+            print("Unrecognised input\n")
+
+
+# Main loop
 while True:
     print("Generate, Settings, Exit")
     inputy = input("//: ").lower().removesuffix("\n")
@@ -133,57 +363,7 @@ while True:
         sys.exit()
 
     elif inputy in settings_table:
-        while True:
-            print(f"\nSettings: Grenades, Weapons, Classes, No-overclock, Upgrades, Save to file, Back/Exit\nCurrent settings:\nGrenades - {settings()[grenades_str]}\nWeapons - {weapons_dict[settings()[weapons_str]]}\nClass - {class_dict[settings()[pclass_str]]}\nSave to file - {settings()[savetofile_str]}\nNo-Overclock - {settings()[no_overclock_str_set]}\nUpgrades - {settings()[upgrades_str]}\n\n")
-            inputy2 = input("//Settings: ").lower().removesuffix("\n")
-            if inputy2 in return_table + exit_table:
-                break
-
-            elif inputy2 in grenades_table:
-                if settings()["Grenades"] is False:
-                    write_setting("Grenades", True)
-                else:
-                    write_setting("Grenades", False)
-                print("Changed grenade settings")
-
-            elif inputy2 in weapons_table:
-                if settings()["Weapons"] == 3:
-                    write_setting("Weapons", 1)
-                else:
-                    write_setting("Weapons", settings()["Weapons"]+1)
-                print("Changed weapons settings")
-
-            elif inputy2 in classes_table:
-                if settings()["pClass"] == 5:
-                    write_setting("pClass", 1)
-                else:
-                    write_setting("pClass", settings()["pClass"]+1)
-                print("Changed class settings")
-
-            elif inputy2 in save_to_file_table:
-                if settings()["SaveToFile"] is False:
-                    write_setting("SaveToFile", True)
-                else:
-                    write_setting("SaveToFile", False)
-                print("Changed saving settings")
-
-            elif inputy2 in no_overclock_table:
-                if settings()["NoOverclock"] is False:
-                    write_setting("NoOverclock", True)
-                    print("Added 'No Overclock' to the overclocks list")
-                else:
-                    write_setting("NoOverclock", False)
-                    print("Removed 'No Overclock' from the overclocks list")
-
-            elif inputy2 in upgrades_table:
-                if settings()["Upgrades"] is False:
-                    write_setting("Upgrades", True)
-                else:
-                    write_setting("Upgrades", False)
-                print("Changed upgrade settings")
-
-            else:
-                print("Unrecognised input.\n")
+        settings_loop()
 
     elif inputy in generate_table:
         generate_random_equipment()
@@ -191,6 +371,3 @@ while True:
     else:
         print("Unrecognised input.\n")
     print("\n")
-
-    """elif inputy in clean_table:
-            print(clean_string_make())"""  # This used to be used. Technically redundant if I'm moving towards having an actual window and not a console.
