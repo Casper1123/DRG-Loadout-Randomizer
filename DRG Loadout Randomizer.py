@@ -100,7 +100,7 @@ def gen_weapon_str(classnum: int, weaponslot: int, ) -> str:
     else:
         slot = "Secondary"
 
-    if settings()["AllOverclocks"]:  # Uses data from json database because user specific data is not required.
+    if not settings()["AllOverclocks"]:  # Uses data from json database because user specific data is not required.
         weapon = datadict[str(classnum)][weaponslot][str(randnum)]  # Picks random weapon container
         return f"{slot}: {weapon[0]}{gen_upgrades(weapon)} - {random.choice(gen_overclock(weapon[1]))}\n"  # concs it's name and picks an OC.
     else:
@@ -109,7 +109,7 @@ def gen_weapon_str(classnum: int, weaponslot: int, ) -> str:
         if not usrdata[str(classnum)][weaponslot][str(randnum)]:  # In the case of no selected overclocks being present, returns 'no overclock'
             overclock = "No Overclock"
         else:
-            overclock = gen_overclock(usrdata[str(classnum)][weaponslot][str(randnum)])
+            overclock = random.choice(gen_overclock(usrdata[str(classnum)][weaponslot][str(randnum)]))
         return f"{slot}: {weapon[0]}{gen_upgrades(weapon)} - {overclock}\n"
 
 
