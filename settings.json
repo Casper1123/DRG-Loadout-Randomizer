@@ -1,1 +1,1 @@
-{"Grenades": true, "SaveToFile": true, "Weapons": 3, "pClass": 5, "NoOverclock": true, "Upgrades": true, "AllOverclocks": false}
+{"Grenades": true, "SaveToFile": false, "Weapons": 3, "pClass": 5, "NoOverclock": false, "Upgrades": true, "MyOverclocks": true}

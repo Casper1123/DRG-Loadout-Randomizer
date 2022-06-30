@@ -38,7 +38,7 @@ class_dict = {
     4: "Scout",
     5: "Random"
 }
-grenades_str, weapons_str, pclass_str, savetofile_str, no_overclock_str_set, upgrades_str, all_overclocks_str = "Grenades", "Weapons", "pClass", "SaveToFile", "NoOverclock", "Upgrades", "AllOverclocks"
+grenades_str, weapons_str, pclass_str, savetofile_str, no_overclock_str_set, upgrades_str, all_overclocks_str = "Grenades", "Weapons", "pClass", "SaveToFile", "NoOverclock", "Upgrades", "MyOverclocks"
 # seems a lil dumb, sometimes used when using dicts inside f"{}"
 
 
@@ -100,7 +100,7 @@ def gen_weapon_str(classnum: int, weaponslot: int, ) -> str:
     else:
         slot = "Secondary"
 
-    if not settings()["AllOverclocks"]:  # Uses data from json database because user specific data is not required.
+    if not settings()["MyOverclocks"]:  # Uses data from json database because user specific data is not required.
         weapon = datadict[str(classnum)][weaponslot][str(randnum)]  # Picks random weapon container
         return f"{slot}: {weapon[0]}{gen_upgrades(weapon)} - {random.choice(gen_overclock(weapon[1]))}\n"  # concs it's name and picks an OC.
     else:
@@ -301,11 +301,11 @@ def my_overclocks_settings():
             my_overclocks_edit()  # Starts a new loop, see it's function.
 
         elif inpult in all_overclocks_table:
-            if settings()["AllOverclocks"] is False:
-                write_setting("AllOverclocks", True)
+            if settings()["MyOverclocks"] is False:
+                write_setting("MyOverclocks", True)
                 print("Enabled generation using all overclocks")
             else:
-                write_setting("AllOverclocks", False)
+                write_setting("MyOverclocks", False)
                 print("Enabled use of 'My Overclocks' only")  # If you don't know what this toggles, then you need to learn to read print statements.
 
         elif inpult in exit_table + return_table:
