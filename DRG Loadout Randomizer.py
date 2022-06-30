@@ -321,7 +321,7 @@ def my_overclocks_edit():
     pClass, weapon, slot = 1, 1, 0  # Initiates some needed data to display.
     while True:
         usrdata = user_data()
-        print(f"\nEdit your obtained Overclocks: Class, Weapon, [number] to toggle Overclock")  # Give options.
+        print(f"\nEdit your obtained Overclocks: Class, Weapon, [number] to toggle Overclock, Back")  # Give options.
         print(f"Current class: {class_dict[pClass]}\nCurrent weapon: {weapondata[str(pClass)][slot][str(weapon)][0]}\n\n[num]: [owned] - [name]       - type [num] to toggle True/False (can be quite picky)")
         # Print current class and selected weapon.
 
@@ -348,6 +348,9 @@ def my_overclocks_edit():
                     weapon = 1
                 else:
                     weapon += 1  # Shifts weapon. If the number >3 then it will shift to the other of the primary/secondary weapon slots and go through there
+
+            elif inpult in return_table + exit_table:
+                return  # Need some way to escape the settings man
 
             # Toggle 'owned' status here. Always supposed to be the last elif.
             elif int(inpult.removesuffix("\n").removesuffix(" ")) <= len(weapondata[str(pClass)][slot][str(weapon)][1])-1:  # if the number given is higher than any on the screen, it stops. Prevents index errors
