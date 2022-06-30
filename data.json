@@ -1,0 +1,67 @@
+{
+  "1": [
+    {
+      "1": ["CRSPR Flamethrower", ["Lighter Tanks", "Sticky Additive", "Compact Feed Valves", "Fuel Stream Diffuser", "Face Melter", "Sticky Fuel"], "23332"],
+    "2": ["Cryo Cannon", ["Improved Thermal Efficiency", "Tuned Cooler", "Flow Rate Expansion", "Ice Spear", "Ice Storm", "Snowball"], "33232"],
+    "3": ["Corrosive Sludge Pump", ["Hydrogen Ion Additive", "AG Mixture", "Volatile Impact Mixture", "Disperser Compound", "Goo Bomber Special", "Sludge Blast"], "33222"]
+    },
+    
+    {
+      "1": ["Subata 120", ["Chain Hit", "Homebrew Powder", "Oversized Magazine", "Automatic Fire", "Explosive Reload", "Tranquilizer Rounds"], "32322"],
+    "2": ["Experimental Plasma Charger", ["Energy Rerouting", "Magnetic Cooling Unit", "Heat Pipe", "Heavy Hitter", "Overcharger", "Persistent Plasma"], "32333"],
+    "3": ["Colette Wave Cooker", ["Liquid Cooling System", "Super Focus Lens", "Diffusion Ray", "Mega Power Supply", "Blistering Necrosis", "Gamma Contamination"], "33223"]
+    },
+    
+    ["Impact Axe", "High Explosive Grenade", "Neurotoxin Grenade"]
+  ],
+  
+  
+  "2": [
+    {
+    "1": ["\"Warthog\" Auto 210", ["Stunner", "Light-Weight Magazines", "Magnetic Pellet Alignment", "Cycle Overload", "Mini Shells"], "23322"],
+    "2": ["\"Stubby\" Voltaic SMG", ["Super-Slim Rounds", "Well Oiled Machine", "EM Refire Booster", "Light-Weight Rounds", "Turret Arc", "Turret EM Discharge"], "33222"],
+    "3": ["LOK-1 Smart Rifle", ["Eraser", "Armor Break Module", "Explosive Chemical Rounds", "Seeker Rounds", "Executioner", "Neuro-Lasso"], "23323"]
+    },
+    
+    {
+    "1": ["Deepcore 40mm PGL", ["Clean Sweep", "Pack Rat", "Compact Rounds", "RJ250 Compound", "Fat Boy", "Hyper Propellant"], "32333"],
+    "2": ["Breach Cutter", ["Light-Weight Cases", "Roll Control", "Stronger Plasma Current", "Return to Sender", "High Voltage Crossover", "Spinning Death", "Inferno"], "23223"],
+    "3": ["Shard Diffractor", ["Efficiency Tweaks", "Automated Beam Controller", "Feedback Loop", "Volatile Impact Reactor", "Plastcrete Catalyst", "Overdrive Booster"], "32223"]
+    },
+    
+    ["L.U.R.E.", "Plasma Burster", "Proximity Mine"]
+  ],
+  
+  
+  "3": [
+    {
+    "1": ["\"Lead Storm\" Powered Minigun", ["A Little More Oomph!", "Thinned Drum Walls", "Burning Hell", "Compact Feed Mechanism", "Exhaust Vectoring", "Bullet Hell", "Lead Storm"], "32333"],
+    "2": ["\"Thunderhead\" Heavy Autocannon", ["Composite Drums", "Splintering Shells", "Carpet Bomber", "Combat Mobility", "Big Bertha", "Neurotoxin Payload"], "33323"],
+    "3": ["\"Hurricane\" Guided Rocket System", ["Manual Guidance Cutoff", "Overtuned Feed Mechanism", "Fragmentation Missiles", "Plasma Burster Missiles", "Minelayer System", "Jet Fuel Homebrew", "Salvo Module"], "32223"]
+    },
+    
+    {
+    "1": ["\"Bulldog\" Heavy Revolver", ["Chain Hit", "Homebrew Powder", "Volatile Bullets", "Six Shooter", "Elephant Rounds", "Magic Bullets"], "23322"],
+    "2": ["BRT7 Burst Fire Gun", ["Composite Casings", "Full Chamber Seal", "Compact Mags", "Experimental Rounds", "Electro Minelets", "Micro Flechettes", "Lead Spray"], "33232"],
+    "3": ["ArmsKore Coil Gun", ["Re-atomizer", "Ultra-Magnetic Coils", "Backfeeding Module", "The Mole", "Hellfire", "Triple-Tech Chambers"], "33223"]
+    },
+    
+    ["Sticky Grenade", "Incendiary Grenade", "Cluster Grenade"]
+  ],
+  
+  "4": [
+    {
+    "1": ["Deepcore GK2", ["Compact Ammo", "Gas Rerouting", "Homebrew Powder", "Overclocked Firing Mechanism", "Bullets of Mercy", "AI Stability Engine", "Electrifying Reload"], "22333"],
+    "2": ["M1000 Classic", ["Hoverclock", "Minimal Clips", "Active Stability System", "Hipster", "Electrocuting Focus Shots", "Supercooling Chamber"], "23323"],
+    "3": ["DRAK-25 Plasma Carbine", ["Aggressive Venting", "Thermal Liquid Coolant", "Impact Deflection", "Rewiring Mod", "Overtuned Particle Accelerator", "Shield Battery Booster", "Thermal Exhaust Feedback"], "32332"]
+    },
+    
+    {
+    "1": ["Jury-Rigged Boomstick", ["Compact Shells", "Double Barrel", "Special Powder", "Stuffed Shells", "Shaped Shells", "Jumbo Shells"], "22333"],
+    "2": ["Zhukov NUK17", ["Minimal Magazines", "Custom Casings", "Cryo Minelets", "Embedded Detonators", "Gas Recycling"], "23232"],
+    "3": ["Nishanka Boltshark X-80", ["Quick Fire", "The Specialist", "Cryo Bolt", "Fire Bolt", "Bodkin Points", "Trifork Volley"], "33223"]
+    },
+    
+    ["Inhibitor-Field Generator", "Cryo Grenade", "Pheromone Canister"]
+  ]
+}
