@@ -53,7 +53,7 @@ Generatable options -- contain all current equipment and their oc's as of Season
  If using my_ocs.json:
  dict[classnum] gives the following:
  [
-    dict[weaponnum],  # Primaries dict that gives list of stored OC's
+    dict[weaponnum],  # Primaries dict that gives lists of stored OC's
     dict[weaponnum],  # Secondaris dict that does the same
     ]
  """
@@ -183,7 +183,6 @@ def my_overclocks_list() -> str:
     output = "\nYour saved 'obtained Overclocks':\n"  # Preps output string
     # for class and then weapon, make string
     for classt in range(1, 5):  # I did not know that it does not include the second number in here. Anyhow, 1-4 for each class.
-        print(classt)
         output = f"{output}" \
                  f"{class_dict[classt]}:\n"  # Adds class indicator
         for weapont in range(1, 6):
@@ -210,7 +209,7 @@ def remove_from_list(container: list, content) -> list:
 def settings_loop():
     while True:
         print(
-            f"\nSettings: Grenades, Weapons, Classes, No-overclock, Upgrades, All-overclocks, My-Overclocks, Information, Save to file, Back/Exit\n"
+            f"\nSettings: Grenades, Weapons, Class, No-overclock, Upgrades, All-overclocks, My-Overclocks, Information, Save to file, Back/Exit\n"
             f"Current settings:\n"
             f"Grenades - {settings()[grenades_str]}\n"
             f"Weapons - {weapons_dict[settings()[weapons_str]]}\n"
