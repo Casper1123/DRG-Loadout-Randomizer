@@ -11,15 +11,16 @@ generate_table = ("g", "generate", "start", "s")
 return_table = ("back", "b")
 clean_table = ("clean", "c", "empty")
 information_table = ("i", "info", "information")
+inputs_table = ("i", "inputs", "in")
 
-grenades_table = ("g", "grenades", "o", "nades")
+grenades_table = ("g", "grenades", "nades")
 weapons_table = ("w", "weapons", "guns", "weapon")
 classes_table = ("c", "class", "classes", "dwarf")
 save_to_file_table = ("s", "save", "file", "save to file")
-no_overclock_table = ("no", "no overclock", "n")
+no_overclock_table = ("n", "no", "no overclock")
 upgrades_table = ("u", "upgrades")
-all_overclocks_table = ("enable", "on", "true")
-my_overclocks_table = ("my", "my oc", "my ocs", "my overclocks", "m")
+all_overclocks_table = ("e", "enable", "on", "true")
+my_overclocks_table = ("m", "my", "my oc", "my ocs", "my overclocks")
 
 list_table = ("l", "list")
 edit_table = ("e", "edit")
@@ -375,7 +376,7 @@ def my_overclocks_edit():
 
 # Main loop
 while True:
-    print("Generate, Settings, Exit")  # Prompt options
+    print("Generate, Settings, Inputs, Exit")  # Prompt options
     inputy = input("//: ").lower().removesuffix("\n")  # Take input
     if inputy in exit_table:
         print("Closing")
@@ -386,6 +387,26 @@ while True:
 
     elif inputy in generate_table:
         generate_random_equipment()  # Generates and prints a string containing randomized loadout information. See function
+
+    elif inputy in inputs_table:
+        print(f"These are the inputs for all options in the entire program.\nIf options overlap, the one above will be used first.\n\n"
+              f"Generate: {unpack_to_string(generate_table,space=True, comma=True)}\n"
+              f"Inputs: {unpack_to_string(inputs_table, space=True, comma=True)}\n"
+              f"Exit program: {unpack_to_string(exit_table, space=True, comma=True)}\n"
+              f"Settings: {unpack_to_string(settings_table, space=True, comma=True)}\n"
+              f"    Grenades: {unpack_to_string(grenades_table, space=True, comma=True)}\n"
+              f"    Weapons: {unpack_to_string(weapons_table, space=True, comma=True)}\n"
+              f"    Class: {unpack_to_string(classes_table, space=True, comma=True)}\n"
+              f"    No-Overclock: {unpack_to_string(no_overclock_table, space=True, comma=True)}\n"
+              f"    Upgrades: {unpack_to_string(upgrades_table, space=True, comma=True)}\n"
+              f"    Save to file: {unpack_to_string(save_to_file_table, space=True, comma=True)}\n"
+              f"    Back: {unpack_to_string(return_table, space=True, comma=True)}, {unpack_to_string(exit_table, True, True)}\n\n"
+              f"    My-Overclocks: {unpack_to_string(my_overclocks_table, space=True, comma=True)}\n"
+              f"        List: {unpack_to_string(list_table, space=True, comma=True)}\n"
+              f"        Edit: {unpack_to_string(edit_table, space=True, comma=True)}\n"
+              f"        Enable: {unpack_to_string(all_overclocks_table, space=True, comma=True)}\n"
+              f"        Back: {unpack_to_string(return_table, space=True, comma=True)}, {unpack_to_string(exit_table, True, True)}\n"
+              )
 
     else:
         print("Unrecognised input.\n")
