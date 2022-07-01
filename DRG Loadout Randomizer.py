@@ -36,7 +36,8 @@ class_dict = {
     2: "Engineer",
     3: "Gunner",
     4: "Scout",
-    5: "Random"
+    5: "Random",
+    6: "All classes",
 }
 grenades_str, weapons_str, pclass_str, savetofile_str, no_overclock_str_set, upgrades_str, all_overclocks_str = "Grenades", "Weapons", "pClass", "SaveToFile", "NoOverclock", "Upgrades", "MyOverclocks"
 # seems a lil dumb, sometimes used when using dicts inside f"{}"
@@ -61,25 +62,28 @@ Generatable options -- contain all current equipment and their oc's as of Season
 
 # Functions
 def generate_random_equipment():
-    # If pClass != 5, then it's 1-4 and therefore defined. Otherwise, gen a random classnum.
     lsettings = settings()
-    if lsettings["pClass"] != 5:  # Set class
+    if lsettings["pClass"] in [1, 2, 3, 4]:  # Set class
         classnum = lsettings["pClass"]
-    else:
+    elif lsettings["pClass"] == 5:
         classnum = random.randint(1, 4)
-
+    else:
+        classnum = 1234
+    output = ""
     datadict = loadout_data()
+    for num in str(classnum):
+        num = int(num)
+        output = f"{output}Class: {class_dict[num]}\n"  # Prepare output string
+        # Checks for setting, if present calls function or picks one.
+        if lsettings["Grenades"]:
+            output = f"{output}Grenade: {random.choice(datadict[str(num)][2])}\n"  # Picks random grenade from container
 
-    output = f"Class: {class_dict[classnum]}\n"  # Prepare output string
-    # Checks for setting, if present calls function or picks one.
-    if lsettings["Grenades"]:
-        output = f"{output}Grenade: {random.choice(datadict[str(classnum)][2])}\n"  # Picks random grenade from container
+        if lsettings["Weapons"] == 1 or lsettings["Weapons"] == 3:
+            output = f"{output}{gen_weapon_str(num, 0)}"  # See the called function for some weird magic IG
 
-    if lsettings["Weapons"] == 1 or lsettings["Weapons"] == 3:
-        output = f"{output}{gen_weapon_str(classnum, 0)}"  # See the called function for some weird magic IG
-
-    if lsettings["Weapons"] == 2 or lsettings["Weapons"] == 3:
-        output = f"{output}{gen_weapon_str(classnum, 1)}"  # ^^
+        if lsettings["Weapons"] == 2 or lsettings["Weapons"] == 3:
+            output = f"{output}{gen_weapon_str(num, 1)}"  # ^^
+        output = f"{output}\n"
 
     print(f"\n{output}")  # puts out output
 
@@ -239,7 +243,7 @@ def settings_loop():
             print("Changed weapons settings")
 
         elif inputy2 in classes_table:
-            if settings()["pClass"] == 5:
+            if settings()["pClass"] == 6:
                 write_setting("pClass", 1)
             else:
                 write_setting("pClass", settings()["pClass"] + 1)
