@@ -185,7 +185,7 @@ def my_overclocks_list() -> str:
     for classt in range(1, 5):  # I did not know that it does not include the second number in here. Anyhow, 1-4 for each class.
         output = f"{output}" \
                  f"{class_dict[classt]}:\n"  # Adds class indicator
-        for weapont in range(1, 6):
+        for weapont in range(1, 7):
             weaponslot = 0
             if weapont > 3:  # This is here because when its 4+ it needs to shift to secondary. Could have been done better with another for-loop perhaps?
                 weapont -= 3
