@@ -3,9 +3,16 @@ from datetime import datetime
 import json
 import sys
 import os
+import tkinter as tk
+import tkinter.ttk as ttk
 
 
-# Input tables -- used for inputs
+# Constants
+wx = 450  # Window x
+wy = 360  # Window Y
+
+
+"""# Input tables -- used for inputs
 exit_table = ("exit", "e", "close")
 settings_table = ("s", "settings", "o", "options")
 generate_table = ("g", "generate", "start", "s")
@@ -24,7 +31,7 @@ all_overclocks_table = ("e", "enable", "on", "true")
 my_overclocks_table = ("m", "my", "my oc", "my ocs", "my overclocks")
 
 list_table = ("l", "list")
-edit_table = ("e", "edit")
+edit_table = ("e", "edit")"""  # Redundant with tkinter usage
 
 
 # Settings -- Translate ints to str from settings. These are for displaying in certain strings
@@ -59,7 +66,7 @@ Generatable options -- contain all current equipment and their oc's as of Season
     dict[weaponnum],  # Primaries dict that gives lists of stored OC's
     dict[weaponnum],  # Secondaris dict that does the same
     ]
- """
+ """  # Not redundant duuh this was always here
 
 
 # Functions
@@ -95,15 +102,15 @@ def generate_random_equipment():
             os.mkdir("Saved output")
         except Exception:
             pass
-        try:
 
+        try:
             dp, empt = ":", "."
-            with open(f"{str(datetime.now()).replace(dp, empt)}.txt", "w") as writefile:
+            with open(f"Saved output/{str(datetime.now()).replace(dp, empt)}.txt", "w") as writefile:
                 writefile.write(output)
         except Exception as err:
             print(f"Error in saving to file.\n{err}")
 
-    return output
+    return output.removesuffix("\n")
 
 
 def gen_weapon_str(classnum: int, weaponslot: int, ) -> str:
@@ -140,13 +147,14 @@ def user_data() -> dict:
     with open("my_ocs.json", "r") as datajson:
         return json.load(datajson)
 
+
 def settings() -> dict:
     # Returns a copy of the settings dict
     with open("settings.json", "r") as settingsjson:
         return json.load(settingsjson)
 
 
-def write_setting(setting: str, value: bool or int):
+def write_setting(setting: str, value, *args):
     # Takes copy of settings dict, edits value, overwrites settings dict.
     settingsdict = settings()
     settingsdict[setting] = value
@@ -190,7 +198,16 @@ def unpack_to_string(container: tuple or list, space: bool = True, comma: bool =
     return output.removesuffix(spaced).removesuffix(commad)  # Clean up the string's bum a lil before returning
 
 
-def my_overclocks_list() -> str:
+def remove_from_list(container: list, content) -> list:
+    # Removes exact content from container.
+    output = []
+    for entry in container:
+        if entry != content:  # Is there really no method builtin for this?
+            output.append(entry)
+    return output
+
+
+"""def my_overclocks_list() -> str:
     # Load data required for output string
     usrdata = user_data()
     weapondata = loadout_data()
@@ -208,19 +225,10 @@ def my_overclocks_list() -> str:
 
             output = f"{output}    {weapondata[str(classt)][weaponslot][str(weapont)][0]}: {unpack_to_string(container=usrdata[str(classt)][weaponslot][str(weapont)], space=True, comma=True, moc=True)}\n"
             # Line above makes this:"   Weaponname: [overclocks]".
-    return output.removesuffix("\n")  # I will return to the \n spam eventually, I promise.
+    return output.removesuffix("\n")  # I will return to the \n spam eventually, I promise."""  # Not redundant yet, just not completely used anymore.
 
 
-def remove_from_list(container: list, content) -> list:
-    # Removes exact content from container.
-    output = []
-    for entry in container:
-        if entry != content:  # Is there really no method builtin for this?
-            output.append(entry)
-    return output
-
-
-# Interactables
+"""# Interactables
 def settings_loop():
     while True:
         print(
@@ -327,10 +335,10 @@ def my_overclocks_settings():
 
         else:
             print("Unrecognised input\n")
-        print("\n")
+        print("\n")""" # Redundant with tkinter usage
 
 
-def my_overclocks_edit():
+"""def my_overclocks_edit():
     weapondata = loadout_data()  # Load static data once
     pClass, weapon, slot = 1, 1, 0  # Initiates some needed data to display.
     while True:
@@ -381,10 +389,10 @@ def my_overclocks_edit():
             else:
                 print("Unrecognised input\n")
         except ValueError:
-            print("Unrecognised input\n")
+            print("Unrecognised input\n")""" # Not redundant yet, just not completely used anymore.
 
 
-# Main loop
+"""# Main loop 
 print("Welcome to the Deep Rock Galactic loadout randomiser.")
 while True:
     print("Generate, Settings, Inputs, Exit")  # Prompt options
@@ -421,4 +429,121 @@ while True:
 
     else:
         print("Unrecognised input.\n")
-    print("\n")
+    print("\n")"""  # Redundant with tkinter usage
+
+
+# New functions with tkinter integration
+# This separator is here because I've still got things to do with putting the things in the right order and commenting them.
+
+
+def update_genoutput():
+    # Updates genoutput with newly generated random equipment
+    genoutput['text'] = generate_random_equipment()
+    if settings()["pClass"] == 6:  # If it generates all 4 classes at once, it needs to be longer
+        main.geometry(f"{wx}x590")
+    else:  # And if it doesn't it needs to be the default size
+        main.geometry(f"{wx}x{wy}")
+
+
+# Weapons dropdown menu setting writer
+# I wish.. I knew how to do this better. Is called whenever the Weapon drop-down menu is changed.
+def weaponsmenu_item_selected(*args):
+    write_setting("Weapons", WeaponsVar.get())
+
+
+# Playerclass dropdown menu setting writer
+# Does the same as the above class. The only reason I have it like this is because I haven't looked at how lambda's work yet.
+def playerclassmenu_item_selected(*args):
+    write_setting("pClass", pClassVar.get())
+
+
+# Exits the program nicely when the button is pressed. Same reason as above functions to have it like this.
+def exit_program():
+    main.quit()
+
+
+# WIP Stub, needs work. Will be done laters
+def my_overclocks_edit():
+    pass
+
+
+# tkinter window creation
+main = tk.Tk()  # Creates window
+main.title("DRG Randomizer")  # Sets title
+main.geometry(f"{wx}x{wy}")  # Sets window size
+main.resizable(False, False)  # Disables resizability
+main.iconbitmap("./icon.ico")  # Sets icon.
+
+
+# Start filling the screen
+ttk.Label(main, text="Settings:").pack(side=tk.TOP)  # Puts a 'Settings: ' string at the top
+
+# Adds Grenades settings button and updates setting in settings file
+GrenadesVar = tk.BooleanVar(value=settings()["Grenades"])  # Define used variable, set it's default value.
+ttk.Checkbutton(main, text="Grenades", command=lambda: write_setting("Grenades", GrenadesVar.get()),
+                                       variable=GrenadesVar, onvalue=True, offvalue=False).pack()  # Make a checkmark button, set it's text and command to call, then define what on and off is and what var to track.
+
+SaveToFilesVar = tk.BooleanVar(value=settings()["SaveToFile"])
+ttk.Checkbutton(main, text="Save to file",
+                                         command=lambda: write_setting("SaveToFile", SaveToFilesVar.get()),
+                                         variable=SaveToFilesVar, onvalue=True, offvalue=False).pack()
+
+# Makes Weapons dropdown menu for Primary, Secondary and Both
+WeaponsVar = tk.IntVar(value=settings()["Weapons"])  # Makes var with default values
+WeaponsVar.trace("w", weaponsmenu_item_selected)  # Constantly updates settings file with current var value
+WeaponsMenuButton = ttk.Menubutton(main, text="Weapons")  # Makes dropdown menu button, which when pressed displays options
+WeaponsMenu = tk.Menu(main, tearoff=False)  # Makes menu object, which is basically a list of buttons that needs to be added first
+
+weaponslotsy = ["Primary", "Secondary", "Both"]  # Content to loop through
+for number, weaponsloty in enumerate(weaponslotsy):  # Loop through all options
+    WeaponsMenu.add_radiobutton(label=weaponsloty, value=number+1, variable=WeaponsVar)  # Adds clickable option with text=label and value=number. value will become the new WeaponsVar value
+WeaponsMenuButton["menu"] = WeaponsMenu  # Adds list of options-buttons to dropdown button
+WeaponsMenuButton.pack()  # Packs the whole ordeal to display.
+
+# Makes Player-Class dropdown menu like above.
+pClassVar = tk.IntVar(value=settings()["pClass"])
+pClassVar.trace("w", playerclassmenu_item_selected)
+pClassMenuButton = ttk.Menubutton(main, text="Classes")
+pClassMenu = tk.Menu(main, tearoff=False)
+
+classlist = ["Driller", "Engineer", "Gunner", "Scout", "Random", "All classes"]
+for numb, classslot in enumerate(classlist):
+    pClassMenu.add_radiobutton(label=classslot, value=numb + 1, variable=pClassVar)
+pClassMenuButton["menu"] = pClassMenu
+pClassMenuButton.pack()
+
+
+# Continue with the True/False checkbox things
+NoOverclockVar = tk.BooleanVar(value=settings()["NoOverclock"])
+ttk.Checkbutton(main, text="No Overclock", command=lambda: write_setting("NoOverclock", NoOverclockVar.get()),
+                variable=NoOverclockVar, onvalue=True, offvalue=False).pack()
+
+UpgradesVar = tk.BooleanVar(value=settings()["Upgrades"])
+ttk.Checkbutton(main, text="Upgrades", command=lambda: write_setting("Upgrades", UpgradesVar.get()),
+                variable=UpgradesVar, onvalue=True, offvalue=False).pack()
+
+MyOverclocksVar = tk.BooleanVar(value=settings()["MyOverclocks"])
+ttk.Checkbutton(main, text="use 'My Overclocks'", command=lambda: write_setting("MyOverclocks", MyOverclocksVar.get()),
+                variable=MyOverclocksVar, onvalue=True, offvalue=False).pack()
+
+# My Overclocks edit
+ttk.Button(main, text=" Edit 'My Overclocks'", command=my_overclocks_edit).pack()  # Currently not working, so it's a WIP stub
+
+
+# Adds a whitespace between settings and generate
+ttk.Label(main, text="").pack()
+
+# Adds a Generate button that calls function when it is clicked
+ttk.Button(main, text="Generate", command=update_genoutput).pack()
+genoutput = ttk.Label(main, text="")  # Makes empy space that can be filled with text. Function in button replaces the empty text with actual text.
+genoutput.pack()
+
+
+# Adds a bit of space and then the exit button at the bottom.
+ttk.Label(main, text="").pack(side=tk.BOTTOM)
+ttk.Button(main, text="Exit", command=exit_program).pack(side=tk.BOTTOM)
+
+
+# Opens main window.
+if __name__ == "__main__":
+    main.mainloop()
