@@ -2,6 +2,7 @@ import random
 from datetime import datetime
 import json
 import sys
+import os
 
 
 # Input tables -- used for inputs
@@ -86,13 +87,23 @@ def generate_random_equipment():
             output = f"{output}{gen_weapon_str(num, 1)}"  # ^^
         output = f"{output}\n"
 
-    print(f"\n{output}")  # puts out output
 
     # Saves output to file if enabled. Uses datetime.now() as filename because it's easy. Does replace the : however, for windows filename sakes.
     if lsettings["SaveToFile"]:
-        dp, empt = ":", "."
-        with open(f"{str(datetime.now()).replace(dp, empt)}.txt", "w") as writefile:
-            writefile.write(output)
+        # Tries to make the output folder first. Passes if it cannot.
+        try:
+            os.mkdir("Saved output")
+        except Exception:
+            pass
+        try:
+
+            dp, empt = ":", "."
+            with open(f"{str(datetime.now()).replace(dp, empt)}.txt", "w") as writefile:
+                writefile.write(output)
+        except Exception as err:
+            print(f"Error in saving to file.\n{err}")
+
+    return output
 
 
 def gen_weapon_str(classnum: int, weaponslot: int, ) -> str:
@@ -118,12 +129,6 @@ def gen_weapon_str(classnum: int, weaponslot: int, ) -> str:
         return f"{slot}: {weapon[0]}{gen_upgrades(weapon)} - {overclock}\n"
 
 
-def settings() -> dict:
-    # Returns a copy of the settings dict
-    with open("settings.json", "r") as settingsjson:
-        return json.load(settingsjson)
-
-
 def loadout_data() -> dict:
     # Returns the json database that stores all of the loadout information that the program uses.
     with open("data.json", "r") as datajson:
@@ -134,6 +139,11 @@ def user_data() -> dict:
     # Returns the json database that has all of the user's saved equipment
     with open("my_ocs.json", "r") as datajson:
         return json.load(datajson)
+
+def settings() -> dict:
+    # Returns a copy of the settings dict
+    with open("settings.json", "r") as settingsjson:
+        return json.load(settingsjson)
 
 
 def write_setting(setting: str, value: bool or int):
@@ -307,10 +317,10 @@ def my_overclocks_settings():
         elif inpult in all_overclocks_table:
             if settings()["MyOverclocks"] is False:
                 write_setting("MyOverclocks", True)
-                print("Enabled generation using all overclocks")
+                print("Enabled use of 'My Overclocks' only")
             else:
                 write_setting("MyOverclocks", False)
-                print("Enabled use of 'My Overclocks' only")  # If you don't know what this toggles, then you need to learn to read print statements.
+                print("Disabled use of 'My Overclocks' only")  # If you don't know what this toggles, then you need to learn to read print statements.
 
         elif inpult in exit_table + return_table:
             return  # Quits loop when instructed.
@@ -375,6 +385,7 @@ def my_overclocks_edit():
 
 
 # Main loop
+print("Welcome to the Deep Rock Galactic loadout randomiser.")
 while True:
     print("Generate, Settings, Inputs, Exit")  # Prompt options
     inputy = input("//: ").lower().removesuffix("\n")  # Take input
@@ -386,7 +397,7 @@ while True:
         settings_loop()  # Starts loop, see function
 
     elif inputy in generate_table:
-        generate_random_equipment()  # Generates and prints a string containing randomized loadout information. See function
+        print(generate_random_equipment())  # Generates and prints a string containing randomized loadout information. See function
 
     elif inputy in inputs_table:
         print(f"These are the inputs for all options in the entire program.\nIf options overlap, the one above will be used first.\n\n"
