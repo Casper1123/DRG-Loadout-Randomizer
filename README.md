@@ -17,3 +17,7 @@ Then select your settings and press generate!\
 I hope you enjoy this thing. It was fun to make.\
 If you want to give me any tips / information about bugfixes/crashes let me know. There are some things I do still want to add to this, but they will come over time.\
 Rock and Stone!
+
+# More information I guess
+If this program does ANYTHING shady let me know asap. It shouldn't.. but then yet again I did use a compiler and setup-creator from the internet that I don't know the source code off.\
+I used pyinstaller for the .exe (which is probably reliable as it's installed through pip) and nsis for the installer-exe
