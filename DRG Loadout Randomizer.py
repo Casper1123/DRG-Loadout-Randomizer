@@ -9,7 +9,7 @@ import tkinter.ttk as ttk
 wx = 450  # Window x
 wy = 360  # Window Y
 mocwx = 200
-mocwy = 200  # My Overclocks window size.
+mocwy = 245  # My Overclocks window size.
 
 """# Input tables -- used for inputs
 exit_table = ("exit", "e", "close")
@@ -145,6 +145,12 @@ def user_data() -> dict:
     # Returns the json database that has all of the user's saved equipment
     with open("my_ocs.json", "r") as datajson:
         return json.load(datajson)
+
+
+def write_user_data(usrdata: dict):
+    # Overwrites the userdata with the given input.
+    with open("my_ocs.json", "w") as userdatajson:
+        json.dump(usrdata, userdatajson)
 
 
 def settings() -> dict:
@@ -474,25 +480,28 @@ def my_overclocks_edit():
         mocWeaponMenuButton.destroy()
         moc_weapondropdown_create()
 
-        # Go through each added overclock-button and remove it. Then, create anew.
-        """for button in overclock_button_list:
-            button.destroy()"""
-        """
-        moc_ocweaponlist_create()"""  # Currently a stub. Will be worked on soon.
+        # Create new list of OC's
+        moc_overclockcheck_create()
 
     def mocWeaponVar_trace(*args):
+        global Weaponnum
+        global mocWeaponslot
+
         # Calculates if the weapon is primary or secondary
         if mocWeaponVar.get() > 3:
-            mocWeaponSlot = 1
+            mocWeaponslot = 1
             Weaponnum = mocWeaponVar.get() - 3
         else:
-            Weaponnum = mocWeaponVar.get()
-            mocWeaponSlot = 0
+            Weaponnum = mocWeaponVar.get() - 0
+            mocWeaponslot = 0
 
         mocWeaponMenuButton["text"] = datadict[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)][0]
         # Changes text of button to be that of the weapon name stored.
 
-    def moc_weapondropdown_create():
+        # Re-create list of oc's dependant on what weapon is now chosen
+        moc_overclockcheck_create()
+
+    def moc_weapondropdown_create(*args):
         # Makes weapons dropdown.
         global mocWeaponVar
         global mocWeaponMenuButton  # These globals are probably excessive.. but eh should be fine.
@@ -514,7 +523,8 @@ def my_overclocks_edit():
                                           variable=mocWeaponVar)  # Adds clickable option with text=label and value=number. value will variable value
             number += 1
         for weapondatanum in range(
-                len(datadict[str(mocClassVar.get())][1])):  # Looping through primaries and secondaries seperately because you can't easily stack dicts.
+                len(datadict[str(mocClassVar.get())][
+                        1])):  # Looping through primaries and secondaries seperately because you can't easily stack dicts.
             mocWeaponMenu.add_radiobutton(label=datadict[str(mocClassVar.get())][1][str(weapondatanum + 1)][0],
                                           value=number + 1,
                                           variable=mocWeaponVar)
@@ -523,8 +533,61 @@ def my_overclocks_edit():
         mocWeaponMenuButton.pack()  # Packs the whole ordeal to display.
         CreateToolTip(mocWeaponMenuButton, "Select which weapon to edit.")
 
+        moc_overclockcheck_create()
+
+    def update_moc_setting(overclock: str, variable: bool = False, *args):
+        usrdata = user_data()  # Get current user data dict to edit
+        print(f"update_moc_setting:\n"
+              f"str = {overclock}\n"
+              f"var = {variable}")
+        if variable:  # If enabled, append it.
+            usrdata[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)].append(overclock)
+            write_user_data(usrdata)
+        else:  # If disabled, remove it
+            usrdata[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)] = remove_from_list(
+                usrdata[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)], overclock)
+            write_user_data(usrdata)
+        # Cannot append twice because it cannot be enabled twice --> checkbutton value is loaded from usrdata upon init
+
+        """if overclock in usrdata[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)]:
+            usrdata[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)] = remove_from_list(
+                usrdata[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)], overclock)
+            write_user_data(usrdata)
+            print(f"{overclock} was removed")
+        else:
+            usrdata[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)].append(overclock)
+            write_user_data(usrdata)
+            print(f"{overclock} was added")"""
+
+    def moc_overclockcheck_create(*args):
+        global mocOverclockList
+        for button in mocOverclockList:
+            button[0].destroy()
+            del button[1]
+
+
+        datadict = loadout_data()
+        mocOverclockList = []
+        mocOverclockVars = []
+
+        # Creates all of the required checkbuttons for the overclocks
+        for numbers, oc in enumerate(datadict[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)][1]):  # Takes number for comparison and overclock for text input
+            mocOverclockVar = tk.BooleanVar(
+                value=datadict[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)][1][numbers] in
+                      user_data()[str(mocClassVar.get())][mocWeaponslot][str(Weaponnum)])  # Sets default value to if the OC is in my_ocs.json
+            mocOverclockButton = ttk.Checkbutton(mocwin, text=oc,
+                                                 command=lambda overcl=oc, var=mocOverclockVar: update_moc_setting(overcl, var.get()),
+                                                 variable=mocOverclockVar, onvalue=True, offvalue=False)  # Makes button
+            mocOverclockButton.pack()
+            mocOverclockList.append([mocOverclockButton, mocOverclockVar])  # Stores things so they can be deleted laters.
+
     def close_mocwin():
-        mocwin.quit()
+        mocwin.destroy()
+        """print(f"x = {mocwin.winfo_width()}\n"
+              f"y = {mocwin.winfo_height()}\n"
+              f"Class = {class_dict[mocClassVar.get()]}")"""
+        main.attributes('-topmost', True)
+        main.attributes('-topmost', False)
 
     mocwin = tk.Toplevel(main)  # Creates new window.
     datadict = loadout_data()  # Load data
@@ -532,9 +595,13 @@ def my_overclocks_edit():
     # tkinter window creation
     mocwin.title("My Overclocks settings")  # Sets title
     mocwin.geometry(f"{mocwx}x{mocwy}")  # Sets window size
-    mocwin.resizable(True, True)  # Disables resizability
+    mocwin.resizable(False, False)  # Disables resizability
     mocwin.iconbitmap("./icon.ico")  # Sets icon.
     mocwin.grab_set()  # removes focus from the other one. You have to close this one first before removing.
+    mocwin.columnconfigure(0, weight=3)
+    mocwin.columnconfigure(1, weight=3)
+    mocwin.columnconfigure(2, weight=3)
+
     # Start Displaying:
     # Make close button. Space it out a little from the bottom side
     ttk.Label(mocwin, text="").pack(side=tk.BOTTOM)
@@ -559,12 +626,17 @@ def my_overclocks_edit():
     CreateToolTip(mocClassMenuButton, "Edit this class' generatable Overclocks!")
 
     global mocWeaponVar
-    global mocWeaponSlot  # Globals for stuff. This is so it's guaranteed that the functions below can use them
+    global mocWeaponslot  # Globals for stuff. This is so it's guaranteed that the functions below can use them
+    global mocOverclockList
+    global Weaponnum
 
     mocWeaponVar = tk.IntVar(value=1)
+    Weaponnum = 1
     mocWeaponslot = 0  # Default values
+    mocOverclockList = []
 
     moc_weapondropdown_create()  # Creates a weapon dropdown
+    moc_overclockcheck_create()  # Creates all checkboxes for the overclocks for this weapon.
 
 
 # Something important of note.
@@ -697,7 +769,7 @@ MyOverclocksButton = ttk.Checkbutton(main, text="use 'My Overclocks'",
                                      variable=MyOverclocksVar, onvalue=True, offvalue=False)
 MyOverclocksButton.pack()
 CreateToolTip(MyOverclocksButton,
-              "Toggles if all overclocks in the game\n or just the ones you have selected are used.")
+              "Toggles if all overclocks in the game\n or just the ones you have selected are used.\n!Important! ; Disabling this can generate Overclocks you don't own!")
 
 # My Overclocks edit
 MyOverclocksEditButton = ttk.Button(main, text=" Edit 'My Overclocks'",
