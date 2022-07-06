@@ -3,6 +3,10 @@ My first attempt at a piece of software.
 
 # Download:
 > https://github.com/Casper1123/DRG-Loadout-Randomizer/releases
+> 
+> There are a couple known issues. If the settings are not saved or buttons cannot be changed, try running it as administrator to allow the program to edit the files.\
+> If your Antivirus screams, that is because it's a python file directly turned into an executable without a certificate. All code is displayed on this page and you're free to see that there is nothing in here that can be harmful.
+> You're free to whitelist it, or don't I am not the one to make that decision.
 
 # Introduction:
 This is a small piece of software that generates random equipment that you can use in game to keep it fresh, or challenging, or anything you want.\
