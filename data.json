@@ -12,7 +12,7 @@
     "3": ["Colette Wave Cooker", ["Liquid Cooling System", "Super Focus Lens", "Diffusion Ray", "Mega Power Supply", "Blistering Necrosis", "Gamma Contamination"], "33223"]
     },
     
-    ["Impact Axe", "High Explosive Grenade", "Neurotoxin Grenade"]
+    ["Impact Axe", "High Explosive Grenade", "Neurotoxin Grenade", "Springloaded Ripper"]
   ],
   
   
@@ -29,7 +29,7 @@
     "3": ["Shard Diffractor", ["Efficiency Tweaks", "Automated Beam Controller", "Feedback Loop", "Volatile Impact Reactor", "Plastcrete Catalyst", "Overdrive Booster"], "32223"]
     },
     
-    ["L.U.R.E.", "Plasma Burster", "Proximity Mine"]
+    ["L.U.R.E.", "Plasma Burster", "Proximity Mine", "S.S.G."]
   ],
   
   
@@ -46,7 +46,7 @@
     "3": ["ArmsKore Coil Gun", ["Re-atomizer", "Ultra-Magnetic Coils", "Backfeeding Module", "The Mole", "Hellfire", "Triple-Tech Chambers"], "33223"]
     },
     
-    ["Sticky Grenade", "Incendiary Grenade", "Cluster Grenade"]
+    ["Sticky Grenade", "Incendiary Grenade", "Cluster Grenade", "Tactical Leadburster"]
   ],
   
   "4": [
@@ -62,6 +62,6 @@
     "3": ["Nishanka Boltshark X-80", ["Quick Fire", "The Specialist", "Cryo Bolt", "Fire Bolt", "Bodkin Points", "Trifork Volley"], "33223"]
     },
     
-    ["Inhibitor-Field Generator", "Cryo Grenade", "Pheromone Canister"]
+    ["Inhibitor-Field Generator", "Cryo Grenade", "Pheromone Canister", "Voltaic Stun Sweeper"]
   ]
 }
